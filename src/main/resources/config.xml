@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+	<int:gateway id="gateway" service-interface="com.example.controller.Gateway"
+		default-request-channel="findGameChannel" default-reply-channel="findGameChannelResponse">
+		
+		<int:default-header name="calledMethod" expression="#gatewayMethod.name" />
+	</int:gateway>
+
+	<int:channel id="findGameChannel">
+		<int:interceptors>
+			<int:wire-tap channel="loggingTransformer" />
+		</int:interceptors>
+	</int:channel>
+
+	<int:logging-channel-adapter id="loggingTransformer"
+		logger-name="CUSTOM_LOG" log-full-message="true" level="INFO" />
+
+	<int:channel id="findGameChannelResponse" />
+
+	<int:chain id="chainFlow" input-channel="findGameChannel" output-channel="findGameChannelResponse">
+		<int:header-enricher>
+			<int:header name="originalRequest" expression="payload" />
+		</int:header-enricher>
+		<int:service-activator ref="gameService" method="findOne" />
+		<int:transformer ref="gameServiceTransformer" method="modelToDto" />
+	</int:chain>
+
+</beans>
