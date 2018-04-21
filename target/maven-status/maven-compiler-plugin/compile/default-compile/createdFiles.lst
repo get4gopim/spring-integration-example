@@ -1,6 +1,0 @@
-com\example\controller\GreetingsController.class
-com\example\Application.class
-com\example\model\Greeting.class
-com\example\model\GameInfo.class
-com\example\model\GamePlatform.class
-com\example\service\GameService.class
